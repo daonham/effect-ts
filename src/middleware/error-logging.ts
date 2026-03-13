@@ -1,11 +1,20 @@
 import { HttpApiBuilder } from "@effect/platform";
 import { Cause, Effect } from "effect";
 import { Api } from "../api.ts";
+import { config } from "../config.ts";
 
 const extractCauseDetails = (cause: Cause.Cause<unknown>) => ({
   failures: Cause.failures(cause).pipe((chunk) => [...chunk]),
   defects: Cause.defects(cause).pipe((chunk) =>
-    [...chunk].map((d) => (d instanceof Error ? { name: d.name, message: d.message, stack: d.stack } : d)),
+    [...chunk].map((d) =>
+      d instanceof Error
+        ? {
+            name: d.name,
+            message: d.message,
+            ...(config.NODE_ENV !== "production" ? { stack: d.stack } : {}),
+          }
+        : d,
+    ),
   ),
   isInterrupted: Cause.isInterrupted(cause),
 });
