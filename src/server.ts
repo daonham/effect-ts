@@ -5,10 +5,10 @@ import { Api } from "./api.ts";
 import { HandlersLive } from "./api/handlers.ts";
 import { withLogging } from "./api/middleware.ts";
 
-export const port = 3000;
-
 export const ServerLive = HttpApiBuilder.serve(withLogging).pipe(
   Layer.provide(HttpApiBuilder.api(Api)),
   Layer.provide(HandlersLive),
-  Layer.provide(BunHttpServer.layer({ port })),
+  Layer.provide(
+    BunHttpServer.layer({ port: Number(process.env.PORT ?? 3000) }),
+  ),
 );

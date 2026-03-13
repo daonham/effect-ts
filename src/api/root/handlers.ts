@@ -5,8 +5,8 @@ import { Api } from "../../api.ts";
 export const RootLive = HttpApiBuilder.group(Api, "Root", (handlers) =>
   handlers.handle("root", () =>
     Effect.succeed({
-      name: "Hello API",
-      version: "1.0.0",
+      name: process.env.API_NAME,
+      version: process.env.API_VERSION,
     }),
   ),
 );
