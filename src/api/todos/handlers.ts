@@ -1,14 +1,13 @@
 import { HttpApiBuilder } from "@effect/platform";
-import { Layer } from "effect";
+import { Effect } from "effect";
 import { Api } from "../../api.ts";
-import * as TodoService from "./services.ts";
-import { TodoStoreLive } from "./store.ts";
+import { TodoStore } from "./store.ts";
 
 export const TodosLive = HttpApiBuilder.group(Api, "Todos", (handlers) =>
   handlers
-    .handle("getTodos", () => TodoService.getAll())
-    .handle("getTodo", ({ path }) => TodoService.getById(path.id))
-    .handle("createTodo", ({ payload }) => TodoService.create(payload.title))
-    .handle("toggleTodo", ({ path }) => TodoService.toggle(path.id))
-    .handle("deleteTodo", ({ path }) => TodoService.remove(path.id)),
-).pipe(Layer.provide(TodoStoreLive));
+    .handle("getTodos", () => Effect.flatMap(TodoStore, (s) => s.getAll()))
+    .handle("getTodo", ({ path }) => Effect.flatMap(TodoStore, (s) => s.getById(path.id)))
+    .handle("createTodo", ({ payload }) => Effect.flatMap(TodoStore, (s) => s.create(payload.title)))
+    .handle("toggleTodo", ({ path }) => Effect.flatMap(TodoStore, (s) => s.toggle(path.id)))
+    .handle("deleteTodo", ({ path }) => Effect.flatMap(TodoStore, (s) => s.remove(path.id))),
+);
