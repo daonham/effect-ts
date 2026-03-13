@@ -92,15 +92,13 @@ export const TodoStoreLive = Layer.effect(
       toggle: (id: number) =>
         Effect.gen(function* () {
           const result = yield* Ref.modify(ref, (state) => {
-            const index = state.todos.findIndex((t) => t.id === id);
-            if (index === -1) return [undefined, state];
-            const updated = {
-              ...state.todos[index],
-              completed: !state.todos[index].completed,
-            };
-            const todos = [...state.todos];
-            todos[index] = updated;
-            return [updated, { ...state, todos }];
+            const existing = state.todos.find((t) => t.id === id);
+            if (!existing) return [undefined, state] as const;
+            const updated = { ...existing, completed: !existing.completed };
+            return [
+              updated,
+              { ...state, todos: state.todos.map((t) => (t.id === id ? updated : t)) },
+            ] as const;
           });
           if (!result) {
             yield* Effect.logWarning("Todo not found for toggle").pipe(
